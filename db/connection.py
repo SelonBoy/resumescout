@@ -17,13 +17,11 @@ load_dotenv()
 
 def _build_url() -> str:
     """Build MySQL connection URL dari environment variables."""
-    host     = os.getenv("MYSQL_HOST", "localhost")
-    port     = os.getenv("MYSQL_PORT", "3306")
-    user     = os.getenv("MYSQL_USER", "root")
-    password = os.getenv("MYSQL_PASSWORD", "")
-    db       = os.getenv("MYSQL_DB", "resumedb")
-    return f"mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
+    url = os.getenv("DATABASE_URL")
+    if not url:
+        raise ValueError("DATABASE_URL belum diset!")
 
+    return url
 
 @lru_cache(maxsize=1)
 def get_engine() -> Engine:
@@ -45,6 +43,6 @@ def get_langchain_db() -> SQLDatabase:
     url = _build_url()
     return SQLDatabase.from_uri(
         url,
-        include_tables=["candidates"],   # aman, tabel users tidak terekspos
+        include_tables=["candidates"],
         sample_rows_in_table_info=3,
     )
