@@ -50,16 +50,8 @@ MAX_CHARS       = 2000
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-def get_engine_no_db():
-    """Engine tanpa specify DB — untuk CREATE DATABASE."""
-    url = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}"
-    return create_engine(url)
-
-
-def get_engine_with_db():
-    """Engine dengan DB — untuk operasi tabel."""
-    url = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
-    return create_engine(url)
+def get_engine():
+    return create_engine(os.getenv("DATABASE_URL"))
 
 
 # ── Step 1: Setup MySQL ───────────────────────────────────────────────────────
