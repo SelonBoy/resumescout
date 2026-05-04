@@ -58,36 +58,32 @@ def get_engine():
 def setup_mysql():
     print("\n[1/5] Setup MySQL...")
 
-    # Buat database jika belum ada
-    engine_no_db = get_engine_no_db()
-    with engine_no_db.connect() as conn:
-        conn.execute(text(f"CREATE DATABASE IF NOT EXISTS {MYSQL_DB}"))
-        conn.commit()
-    print(f"  ✅ Database '{MYSQL_DB}' siap.")
+    engine = get_engine()
 
-    engine = get_engine_with_db()
     with engine.connect() as conn:
-        # Tabel users
+        # users table
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS users (
-                id            INT AUTO_INCREMENT PRIMARY KEY,
-                username      VARCHAR(50) UNIQUE NOT NULL,
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                username VARCHAR(50) UNIQUE NOT NULL,
                 password_hash VARCHAR(255) NOT NULL,
-                role          ENUM('hr', 'jobseeker') NOT NULL,
-                created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                role ENUM('hr', 'jobseeker') NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """))
 
-        # Tabel candidates
+        # candidates table
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS candidates (
-                id        INT PRIMARY KEY,
-                category  VARCHAR(50) NOT NULL,
+                id INT PRIMARY KEY,
+                category VARCHAR(50) NOT NULL,
                 resume_id INT NOT NULL,
                 INDEX idx_category (category)
             )
         """))
+
         conn.commit()
+
     print("  ✅ Tabel 'users' dan 'candidates' siap.")
 
 
@@ -100,7 +96,7 @@ def insert_default_users():
         ("jobseeker", "js123",  "jobseeker"),
     ]
 
-    engine = get_engine_with_db()
+    engine = get_engine()
     with engine.connect() as conn:
         for username, plain_pw, role in default_users:
             # Cek apakah sudah ada
@@ -152,7 +148,7 @@ def preprocess_csv() -> pd.DataFrame:
 def insert_to_mysql(df: pd.DataFrame):
     print("\n[4/5] Insert candidates ke MySQL...")
 
-    engine = get_engine_with_db()
+    engine = get_engine()
     with engine.connect() as conn:
         # Cek apakah sudah ada data
         count = conn.execute(text("SELECT COUNT(*) FROM candidates")).scalar()
