@@ -32,11 +32,14 @@ from rag.retriever import get_embedder
 load_dotenv()
 
 # ── Config ────────────────────────────────────────────────────────────────────
-MYSQL_HOST      = os.getenv("MYSQL_HOST", "localhost")
-MYSQL_PORT      = os.getenv("MYSQL_PORT", "3306")
-MYSQL_USER      = os.getenv("MYSQL_USER", "root")
-MYSQL_PASSWORD  = os.getenv("MYSQL_PASSWORD", "")
-MYSQL_DB        = os.getenv("MYSQL_DB", "resumedb")
+from urllib.parse import quote_plus
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL belum diset!")
+
+engine = create_engine(DATABASE_URL)
 QDRANT_URL      = os.getenv("QDRANT_URL")
 QDRANT_API_KEY  = os.getenv("QDRANT_API_KEY")
 COLLECTION_NAME = os.getenv("COLLECTION_NAME", "resumes")
